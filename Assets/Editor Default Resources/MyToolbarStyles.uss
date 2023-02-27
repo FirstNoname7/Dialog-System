@@ -1,0 +1,57 @@
+Toolbar
+{
+	background-color: #021968;
+	height: 40;
+}
+
+TextField
+{
+	padding: 2px;
+}
+
+Button /*стиль для кнопки*/
+{
+	background-color: #90f2fe;
+	border-color: #1D1D1E; /*цвет обводки кнопки*/
+	max-height:25px;
+	margin:4px;
+}
+
+Button:hover /*при клике на кнопку*/
+{
+	background-color: #3ffd32;
+}
+
+Button:active
+{
+	background-color: #fd69c6;
+	color: #c502f4; /*цвет текста*/
+}
+
+.unity-text-field__label
+{
+	padding: 2px;
+}
+
+TextField:focus > .unity-text-field__label
+{
+	color: #28fbfa;
+}
+
+.unity-text-field__input
+{
+	background-color: #021968; /*цвет поля для заголовка*/
+	/*border-color: #ac3d02; /*обводка поля для заголовка*/
+	border-radius: 10px; /*закругление поля для заголовка*/
+	max-height: 29px; /*максимальная ширина ноды*/
+	min-height: 16px; /*минимальная ширина ноды*/
+	-unity-text-align: middle-center; /*ставлю текст по центру*/
+	padding-left: 7px;
+	/*padding: 8px;*/
+}
+
+.unity-text-field__input:focus
+{
+	color: #e605e9;
+}
+

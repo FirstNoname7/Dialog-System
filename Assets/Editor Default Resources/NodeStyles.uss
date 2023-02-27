@@ -1,0 +1,133 @@
+/*https://docs.unity3d.com/Manual/UIE-uss-properties.html*/
+/*контейнеры*/
+.mary-node__extension-container /*Для того, что не является окном заголовка ноды*/
+{
+	background-color: #021968;
+	padding: 3px;
+}
+
+.mary-node__main-container /*Для окна заголовка ноды*/
+{
+	background-color: #0241b1;
+}
+
+.mary-node__custom-data-container
+{
+	background-color: #0241b1;
+	border-radius: 4px;
+	padding: 8px;
+}
+
+/*входы*/
+.mary-node__textfield > .unity-text-field__input /*говорю, что мой кастомный стиль приоритетнее, чем стандартный стиль от юнити. Это стиль для заголовка*/
+{
+	background-color: #021968; /*цвет поля для заголовка*/
+	/*border-color: #ac3d02; /*обводка поля для заголовка*/
+	border-radius: 10px; /*закругление поля для заголовка*/
+	max-width: 290px; /*максимальная ширина ноды*/
+	min-width: 160px; /*минимальная ширина ноды*/
+	-unity-text-align: middle-center; /*ставлю текст по центру*/
+	/*padding: 8px;*/
+}
+
+.mary-node__textfield__hidden > .unity-text-field__input
+{
+	background-color: transparent; /*ставлю полную прозрачность*/
+	border-color: transparent;
+}
+
+.mary-node__textfield__hidden > .unity-text-field__input:focus /*ставлю псевдокласс focus, чтоб настроить стиль ноды при наведении на неё*/
+{
+	background-color: #013288;
+	border-color: #ac3d02;
+}
+
+.mary-node__filename-textfield > .unity-text-field__input
+{
+	max-width: 1000px; /*переопределяем максимальную ширину зачем-то*/
+}
+
+.mary-node__filename-textfield > .unity-text-field__input:focus
+{
+	margin: 4px;
+	padding:4px;
+}
+
+.mary-node__choice-textfield > .unity-text-field__input /*стиль для кнопки выбора*/
+{
+	font-size:11px; /*размер шрифта кнопки выбора*/
+	height:35px; /*высота кнопки выбора*/
+	max-width:1000px;
+	min-width:0px;
+}
+
+.mary-node__choice-textfield > .unity-text-field__input:focus /*стиль для кнопки выбора, на которые я навожусь*/
+{
+	height:25px;
+	margin:4px;
+	padding:4px;
+}
+
+.mary-node__quote-textfield > .unity-text-field__input /*стиль для */
+{
+	background-color: #232527;
+	border-color: transparent;
+	border-left-color: #27292C;
+	border-left-width: 4px;
+	padding: 16px;
+	max-width:600px;
+}
+.mary-node__quote-textfield > .unity-text-field__input:hover /*стиль для */
+{
+	background-color: #232529; /*чуть светлее, чем у стиля чуть выше*/
+}
+
+.mary-node__quote-textfield > .unity-text-field__input:focus /*стиль для */
+{
+	background-color: #013288;
+	border-color: #ac3d02;
+}
+
+/*Кнопки*/
+.mary-node__button /*стиль для кнопки*/
+{
+	background-color: #90f2fe;
+	border-color: #1D1D1E; /*цвет обводки кнопки*/
+	max-height:25px;
+	margin:4px;
+}
+
+.mary-node__button:hover /*при клике на кнопку*/
+{
+	background-color: #3ffd32;
+}
+
+.mary-node__button:active
+{
+	background-color: #fd69c6;
+	color: #c502f4; /*цвет текста*/
+}
+
+/*элементы*/
+TextField
+{
+	margin-left:0px;
+}
+
+.mary-node__custom-data_container > Foldout
+{
+	margin-left: -4px;
+	margin-top: 4px;
+}
+
+.mary-node__custom-data_container > Foldout > TextField
+{
+	margin-left: -12px;
+	margin-top: 8px;
+}
+
+/*built in*/
+.unity-toggle__text
+{
+	margin-left:2px;
+}
