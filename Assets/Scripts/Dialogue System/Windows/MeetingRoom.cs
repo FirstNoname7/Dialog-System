@@ -9,6 +9,7 @@ namespace MaryDialogSystem.Windows
 {
     public class MeetingRoom : EditorWindow //отвечает за визуальную сторону редактора (визуалка моей переговорной)
     {
+        private MyGraphView graphView; //ссылка на мой граф
         private readonly string defaultFileName = "Имя диалогового файла"; //стандартное имя переговорной (открыто только для чтения)
         private TextField fileNameTextField; //название текстового поля
         private Button saveButton; //кнопка для сохранения инфы в тулбаре
@@ -29,7 +30,7 @@ namespace MaryDialogSystem.Windows
         #region Add
         private void AddGraphView()
         {
-            MyGraphView graphView = new MyGraphView(this); //создаю экземпляр скрипта, в котором показывается UI моей переговорной
+            graphView = new MyGraphView(this); //создаю экземпляр скрипта, в котором показывается UI моей переговорной
             graphView.StretchToParentSize(); //растягиваю UI на размер всей переговорной (когда меняешь её размер, будет меняться размер UI)
             rootVisualElement.Add(graphView); //добавляю UI в переговорную (rootVisualElement - эт дефолт от скрипта EditorWindow)
         }
@@ -41,12 +42,13 @@ namespace MaryDialogSystem.Windows
             {
                 fileNameTextField.value = callback.newValue.RemoveWhitespaces().RemoveSpecialCharacters(); //старое значение текстового поля заменяется на новое и в новом удаляются все пробелы и спец. символы
             }); //в тулбаре текстовое поле с стандартным названием (создание происходит в моем методе CreateTextField)
-            saveButton = ElementUtility.CreateButton("Сохранить"); //инициализируем кнопку
+            saveButton = ElementUtility.CreateButton("Сохранить", ()=>Save()); //инициализируем кнопку, в обратный вызов (()=>Save()) ставим ссылку на метод Save, который сохраняет данные
             toolbar.Add(fileNameTextField); //добавляю к тулбару текстовое поле
             toolbar.Add(saveButton); //добавляю к тулбару кнопку сохранения 
             toolbar.AddStyleSheets("MyToolbarStyles.uss"); //устанавливаю стиль для тулбара
             rootVisualElement.Add(toolbar); //добавляю в переговорную тулбар 
         }
+
 
         private void AddStyles() //добавляю свой Style Sheet для фона окошка
         {
@@ -55,7 +57,23 @@ namespace MaryDialogSystem.Windows
             //папка называется именно так, потому что это дефолтное имя для ресурсов, которые создаешь для какого-нить своего редактора)
         }
         #endregion
+        #region Toolbar Actions
+        private void Save() //сохраняшка содержимого переговорной
+        {
+            if (string.IsNullOrEmpty(fileNameTextField.value)) //если нет названия того, что нужно сохранить, то:
+            {
+                EditorUtility.DisplayDialog(
+                    "Неверное имя файла",
+                    "Убедитесь, что введенное вами имя файла является допустимым",
+                    "OK"
+                ); //выводим текст об ошибке (DisplayDialog - зарезервированная функция)
+                return; //возвращаемся, т.к. нам не над сохранять пустой файл
+            }
 
+            InputOutputUtilities.Initialize(graphView, fileNameTextField.value); //инициализируем что именно сохранять (данные в переговорной (graphView) и название переговорной (fileNameTextField.value)
+            InputOutputUtilities.Save(); //ссылаюсь на сохраняшку из другого скрипта
+        }
+        #endregion
         #region Utility Methods
         public void EnableSaving()
         {

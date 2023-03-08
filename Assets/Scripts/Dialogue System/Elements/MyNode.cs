@@ -8,6 +8,7 @@ using MaryDialogSystem.Utilities;
 using MaryDialogSystem.Windows;
 using System;
 using MaryDialogSystem.Data.Save;
+using System.Linq;
 
 namespace MaryDialogSystem.Elements
 {
@@ -43,6 +44,18 @@ namespace MaryDialogSystem.Elements
                 TextField target = (TextField)callback.target; //возвращаем текстовое поле, чтобы в нЄм можно было ремувнуть пробелы
                 target.value = callback.newValue.RemoveWhitespaces().RemoveSpecialCharacters(); //удал€ем пробелы и спец. символы с помощью методов из скрипта TextUtility
 
+                if (string.IsNullOrEmpty(target.value)) //если пустое текстовое поле, то:
+                {
+                    if (!string.IsNullOrEmpty(dialogueName)) //если есть что-то в dialogueName (старое им€ ноды), то:
+                    {
+                        ++myGraphView.RepeatedNamesAmount; //ссылаемс€ на RepeatedNamesAmount, где выводитс€ ошибка. ƒелаем инкремент, т.к. dialogueName = старое им€ ноды, а нам надо сказать об ошибке в текущей ноде, котора€ с пустым текстовым полем
+                    }
+                }
+                else //в обратном случае (если текстовое поле не пусто)
+                {
+                    --myGraphView.RepeatedNamesAmount; //идЄм к старой ноде
+                }
+
                 myGraphView.RemoveNode(this); //удал€ю старую ноду (со старым названием)
                 dialogueName = target.value; //устанавливаю новое значение названи€ ноды (с удалением лишних пробелов)
                 myGraphView.AddNode(this); //добавл€ю ноду  с новым названием
@@ -62,7 +75,10 @@ namespace MaryDialogSystem.Elements
             //наполнение ноды (вс€кие кастомные штучки)
             Foldout textFlodout = ElementUtility.CreateFoldout("‘раза"); //заголовок дл€ диалогового окна (по клику на который откроетс€ фраза)
 
-            TextField textTextField = ElementUtility.CreateTextArea(text); //окошко, где можно писать фразу диалога
+            TextField textTextField = ElementUtility.CreateTextArea(text, null, callback=> 
+            {
+                text = callback.newValue;
+            }); //окошко, где можно писать фразу диалога + обратный вызов, чтоб по€вл€лс€ актуальный текст, если он помен€лс€
             textTextField.AddClasses("mary-node__textfield", "mary-node__quote-textfield"); //добавл€ю стиль текстовому полю, где надо фразу писать
 
             textFlodout.Add(textTextField); //к заголовку добавл€ем поле дл€ ввода фраз диалога 
@@ -92,6 +108,11 @@ namespace MaryDialogSystem.Elements
             }
         }
 
+        public bool IsStartingNode() //провер€ем, текуща€ нода перва€ или нет
+        {
+            Port inputPort = (Port)inputContainer.Children().First(); //входной порт = из контейнера берЄм первый дочерний объект (и конвертируем в Port, т.к. по стандарту такое выражение возвращает IEnumerable)
+            return !inputPort.connected; //возвращает true - если есть пустой входной параметр, false - если входной параметр не пуст. »менно это выражение, т.к. есть нет коннекта (connected), то вход пуст
+        }
         public void SetErrorStyle(Color color) //настроить цвет нод с ошибкой
         {
             mainContainer.style.backgroundColor = color; //какой цвет передаю в параметр, таким он и будет у ноды

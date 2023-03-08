@@ -6,9 +6,9 @@ namespace MaryDialogSystem.Data.Save
 {
     public class GraphSaveDataSO: ScriptableObject //сохраняшка данных в виде Scriptable Object (SO)
     {
-        [SerializeField] public string FileName { get; set; }
-        [SerializeField] public List<NodeSaveData> Nodes { get; set; }
-        [SerializeField] public List<string> OldNodeNames { get; set; }
+        [field: SerializeField] public string FileName { get; set; } //перед модификатором доступа нужно поставить именно [field: SerializeField], чтоб все переменные, которые здесь есть, выводились в инспекторе в SO
+        [field: SerializeField] public List<NodeSaveData> Nodes { get; set; }
+        [field: SerializeField] public List<string> OldNodeNames { get; set; }
 
         public void Initialize(string fileName)
         {
