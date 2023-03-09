@@ -147,6 +147,13 @@ namespace MaryDialogSystem.Windows
             Vector2 localMousePosition = contentViewContainer.WorldToLocal(worldMousePosition); //преобразуем глобальные координаты в локальные (WorldToLocal) в рамках данной переговорной (contentViewContainer)
             return localMousePosition; //возвращаю локальную позицию
         }
+
+        public void ClearGraph() //чтобы очистить переговорную 
+        {
+            graphElements.ForEach(graphElement => RemoveElement(graphElement)); //ремуваем все элементы в переговорной
+            serializableDictionary.Clear(); //очищаем содержимое словаря (там содержатся ноды)
+            RepeatedNamesAmount = 0; //зануляем счетчик повторяющихся имён
+        }
         #endregion
         #region Repeated Elements
         public void AddNode(MyNode node) //добавляю ноды, когда в переговорной нет ни одной ноды. Если ноды есть, то обновляю их с помощью этого метода

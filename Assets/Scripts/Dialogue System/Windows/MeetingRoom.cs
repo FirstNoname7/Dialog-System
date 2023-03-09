@@ -11,8 +11,10 @@ namespace MaryDialogSystem.Windows
     {
         private MyGraphView graphView; //ссылка на мой граф
         private readonly string defaultFileName = "»м€ диалогового файла"; //стандартное им€ переговорной (открыто только дл€ чтени€)
-        private TextField fileNameTextField; //название текстового пол€
+        private static TextField fileNameTextField; //название текстового пол€ (статичное, т.к. эти данные загружаютс€ из сохран€шек, так удобнее)
         private Button saveButton; //кнопка дл€ сохранени€ инфы в тулбаре
+        private Button clearButton;
+        private Button resetButton;
         [MenuItem("Dialogue System/Meeting Room")] //чтоб создать менюшку свою в верхней части юнити
         public static void Open() //тут действи€ при открытии менюшки
         {
@@ -43,8 +45,12 @@ namespace MaryDialogSystem.Windows
                 fileNameTextField.value = callback.newValue.RemoveWhitespaces().RemoveSpecialCharacters(); //старое значение текстового пол€ замен€етс€ на новое и в новом удал€ютс€ все пробелы и спец. символы
             }); //в тулбаре текстовое поле с стандартным названием (создание происходит в моем методе CreateTextField)
             saveButton = ElementUtility.CreateButton("—охранить", ()=>Save()); //инициализируем кнопку, в обратный вызов (()=>Save()) ставим ссылку на метод Save, который сохран€ет данные
+            clearButton = ElementUtility.CreateButton("ќчистить", ()=>Clear()); //создаю кнопку дл€ очистки переговорной, обратный вызов = переход на метод Clear (т.е. когда кликаем на кнопку, то переходим на этот метод)
+            resetButton = ElementUtility.CreateButton("ѕерезагрузить", ()=>Reset()); //создаю кнопку дл€ перезагрузки переговорной
             toolbar.Add(fileNameTextField); //добавл€ю к тулбару текстовое поле
             toolbar.Add(saveButton); //добавл€ю к тулбару кнопку сохранени€ 
+            toolbar.Add(clearButton); //добавл€ю к тулбару кнопку удалени€ содержимого переговорной 
+            toolbar.Add(resetButton); //добавл€ю к тулбару кнопку перезаписи содержимого переговорной на дефолтные значени€
             toolbar.AddStyleSheets("MyToolbarStyles.uss"); //устанавливаю стиль дл€ тулбара
             rootVisualElement.Add(toolbar); //добавл€ю в переговорную тулбар 
         }
@@ -73,8 +79,22 @@ namespace MaryDialogSystem.Windows
             InputOutputUtilities.Initialize(graphView, fileNameTextField.value); //инициализируем что именно сохран€ть (данные в переговорной (graphView) и название переговорной (fileNameTextField.value)
             InputOutputUtilities.Save(); //ссылаюсь на сохран€шку из другого скрипта
         }
+        private void Clear()
+        {
+            graphView.ClearGraph();
+        }
+        private void Reset()
+        {
+            Clear(); //ремуваем всЄ
+            UpdateFileName(defaultFileName); //ставим дефолтные названи€
+        }
+
         #endregion
         #region Utility Methods
+        public static void UpdateFileName(string newFileName) //метод публичен и статичен, т.к. используетс€ при загрузке данных
+        {
+            fileNameTextField.value = newFileName; //обновление текстового пол€
+        }
         public void EnableSaving()
         {
             saveButton.SetEnabled(true); //ну это как saveButton.SetActive(true), только вкл. объект в переговорной, а не в инспекторе
