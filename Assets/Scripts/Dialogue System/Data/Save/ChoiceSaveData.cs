@@ -8,7 +8,7 @@ namespace MaryDialogSystem.Data.Save
     [Serializable]
     public class ChoiceSaveData //сохраняшка для кнопок выбора
     {
-        [SerializeField] public string Text { get; set; } //что за текст в этой ноде
-        [SerializeField] public string NodeID { get; set; } //какую именно ноду сохранить
+        [field: SerializeField] public string Text { get; set; } //что за текст в этой ноде
+        [field: SerializeField] public string NodeID { get; set; } //какую именно ноду сохранить
     }
 }

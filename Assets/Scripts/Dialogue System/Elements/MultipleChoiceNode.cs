@@ -17,9 +17,9 @@ namespace MaryDialogSystem.Elements
             Text = "Ќова€ кнопка"
         }; //сохраненные данные, нам нужен в этом скрипте текст
 
-        public override void Initialize(MyGraphView currentGraphView, Vector2 position)
+        public override void Initialize(string nodeName, MyGraphView currentGraphView, Vector2 position)
         {
-            base.Initialize(currentGraphView, position);
+            base.Initialize(nodeName, currentGraphView, position);
             dialogueType = DialogueType.MultipleChoice; //указываю тип создаваемого блока в переменной dialogueType
 
             choices.Add(choiceData);

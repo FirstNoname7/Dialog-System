@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e62f75666e38374d9f362675e761400, type: 3}
+  m_Name: "\u0420\u041E\u041A"
+  m_EditorClassIdentifier: 
+  <DialogueName>k__BackingField: "\u0420\u041E\u041A"
+  <Text>k__BackingField: "\u041F\u0438\u0448\u0438 \u0444\u0440\u0430\u0437\u0443
+    \u0441\u044E\u0434\u044B"
+  <Choices>k__BackingField: []
+  <DialogueType>k__BackingField: 1
+  <IsStartingDialog>k__BackingField: 0

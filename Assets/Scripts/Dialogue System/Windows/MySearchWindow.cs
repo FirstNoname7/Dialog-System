@@ -42,13 +42,13 @@ namespace MaryDialogSystem.Windows
             {
                 case DialogueType.SingleChoice:
                 {
-                    SingleChoiceNode singleChoiceNode = (SingleChoiceNode)graphView.CreateNode(DialogueType.SingleChoice, localMousePosition); //создаю ноду, на которую кликнула в контекстном меню
+                    SingleChoiceNode singleChoiceNode = (SingleChoiceNode)graphView.CreateNode("Название", DialogueType.SingleChoice, localMousePosition); //создаю ноду, на которую кликнула в контекстном меню
                     graphView.AddElement(singleChoiceNode); //в graphView (переговорную) добавляю ноду, на которую кликнула в контекстном меню
                     return true; //возвращаю true, чтобы нужная нода появлялась только по клику на кнопку, а не сразу как только я наведусь на тип ноды в контекстном меню
                 }
                 case DialogueType.MultipleChoice:
                 {
-                    MultipleChoiceNode multipleChoiceNode = (MultipleChoiceNode)graphView.CreateNode(DialogueType.MultipleChoice, localMousePosition); //создаю ноду, на которую кликнула в контекстном меню
+                    MultipleChoiceNode multipleChoiceNode = (MultipleChoiceNode)graphView.CreateNode("Название", DialogueType.MultipleChoice, localMousePosition); //создаю ноду, на которую кликнула в контекстном меню
                     graphView.AddElement(multipleChoiceNode); //в graphView (переговорную) добавляю ноду, на которую кликнула в контекстном меню
 
                     return true; //возвращаю true, чтобы нужная нода появлялась только по клику на кнопку, а не сразу как только я наведусь на тип ноды в контекстном меню

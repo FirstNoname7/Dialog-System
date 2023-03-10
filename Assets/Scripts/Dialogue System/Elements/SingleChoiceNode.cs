@@ -11,9 +11,9 @@ namespace MaryDialogSystem.Elements
 {
     public class SingleChoiceNode : MyNode //нода для диалога
     {
-        public override void Initialize(MyGraphView currentGraphView, Vector2 position)
+        public override void Initialize(string nodeName, MyGraphView currentGraphView, Vector2 position)
         {
-            base.Initialize(currentGraphView, position);
+            base.Initialize(nodeName, currentGraphView, position);
             dialogueType = DialogueType.SingleChoice; //указываю тип создаваемого блока в переменной dialogueType
             ChoiceSaveData choiceData = new ChoiceSaveData()
             {

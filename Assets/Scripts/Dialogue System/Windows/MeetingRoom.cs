@@ -4,6 +4,7 @@ using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using System;
 using MaryDialogSystem.Utilities;
+using System.IO;
 
 namespace MaryDialogSystem.Windows
 {
@@ -15,6 +16,7 @@ namespace MaryDialogSystem.Windows
         private Button saveButton; //кнопка дл€ сохранени€ инфы в тулбаре
         private Button clearButton;
         private Button resetButton;
+        private Button loadButton;
         [MenuItem("Dialogue System/Meeting Room")] //чтоб создать менюшку свою в верхней части юнити
         public static void Open() //тут действи€ при открытии менюшки
         {
@@ -47,10 +49,12 @@ namespace MaryDialogSystem.Windows
             saveButton = ElementUtility.CreateButton("—охранить", ()=>Save()); //инициализируем кнопку, в обратный вызов (()=>Save()) ставим ссылку на метод Save, который сохран€ет данные
             clearButton = ElementUtility.CreateButton("ќчистить", ()=>Clear()); //создаю кнопку дл€ очистки переговорной, обратный вызов = переход на метод Clear (т.е. когда кликаем на кнопку, то переходим на этот метод)
             resetButton = ElementUtility.CreateButton("ѕерезагрузить", ()=>Reset()); //создаю кнопку дл€ перезагрузки переговорной
+            loadButton = ElementUtility.CreateButton("«агрузить", ()=>Load()); //создаю кнопку дл€ загрузки того, что сохран€ли в переговорной
             toolbar.Add(fileNameTextField); //добавл€ю к тулбару текстовое поле
             toolbar.Add(saveButton); //добавл€ю к тулбару кнопку сохранени€ 
             toolbar.Add(clearButton); //добавл€ю к тулбару кнопку удалени€ содержимого переговорной 
             toolbar.Add(resetButton); //добавл€ю к тулбару кнопку перезаписи содержимого переговорной на дефолтные значени€
+            toolbar.Add(loadButton); //добавл€ю к тулбару кнопку загрузки того, что сохран€ли в переговорной
             toolbar.AddStyleSheets("MyToolbarStyles.uss"); //устанавливаю стиль дл€ тулбара
             rootVisualElement.Add(toolbar); //добавл€ю в переговорную тулбар 
         }
@@ -79,6 +83,18 @@ namespace MaryDialogSystem.Windows
             InputOutputUtilities.Initialize(graphView, fileNameTextField.value); //инициализируем что именно сохран€ть (данные в переговорной (graphView) и название переговорной (fileNameTextField.value)
             InputOutputUtilities.Save(); //ссылаюсь на сохран€шку из другого скрипта
         }
+        private void Load()
+        {
+            string filePath = EditorUtility.OpenFilePanel("Dialogue Graphs", "Assets/Editor/MeetingRoom/Graphs", "asset"); //метод OpenFilePanel открываем папку в проводнике по пути "Assets/Editor/MeetingRoom/Graphs" и можно выбрать файлы с расширением asset
+            if (string.IsNullOrEmpty(filePath)) //если нет пути, указанного в filePath, то:
+            {
+                return; //прост возвращаемс€, нам нечего загружать
+            }
+            Clear(); //очищаем переговорную от всего, что там было, чтобы загруженные файлы не наслоились на то, что ты накидала в переговорную
+            InputOutputUtilities.Initialize(graphView, Path.GetFileNameWithoutExtension(filePath)); //инициализируем граф, который надо загрузить (graphView) с именем filePath (без расширени€, т.е. без .asset)
+            InputOutputUtilities.Load(); //загружаем данные, которые сохранили
+        }
+
         private void Clear()
         {
             graphView.ClearGraph();

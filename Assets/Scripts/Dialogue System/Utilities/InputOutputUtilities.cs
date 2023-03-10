@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace MaryDialogSystem.Utilities
@@ -20,6 +21,7 @@ namespace MaryDialogSystem.Utilities
         private static string containerFolderPath;  //путь к контейнерам (где хранятся базовые элементы для переговорной) 
         private static List<MyNode> nodes; //ноды
         private static Dictionary<string, DialogueSO> createdDialogues; //словарь, где ключ = айдишник текущей диалоговой ноды, значение = SO для сохраняшки диалогов
+        private static Dictionary<string, MyNode> loadedNodes; //ноды, загруженные из сохраняшки
         public static void Initialize(MyGraphView graphView, string graphName) //тут иницилаизируем базовые штуки
         {
             myGraphView = graphView; //текущая переговорная
@@ -27,6 +29,7 @@ namespace MaryDialogSystem.Utilities
             containerFolderPath = $"Assets/MeetingRoom/Dialogues/{graphFileName}"; //путь к файлу текущей переговорной
             nodes = new List<MyNode>(); //выделяем память под список с нодами
             createdDialogues = new Dictionary<string, DialogueSO>(); //инициализируем переменную
+            loadedNodes = new Dictionary<string, MyNode>(); //инициализируем переменную
         }
         #region Save Methods
         public static void Save() //сохраняшка
@@ -43,6 +46,64 @@ namespace MaryDialogSystem.Utilities
 
             SaveAsset(graphSaveDataSO); //сохраняем данные из ассета для SO (Scriptable Object)
             SaveAsset(dialogueContainer); //сохраняем контейнер для диалогов
+        }
+
+        #endregion
+
+        #region Load Methods
+        public static void Load()
+        {
+            GraphSaveDataSO graphData = LoadAsset<GraphSaveDataSO>("Assets/Editor/MeetingRoom/Graphs", graphFileName); //загружаем ассет по указанному пути (мы до этого в этот путь загружали данные) с именем graphFileName
+            if (graphData == null) //если нечего загружать, то:
+            {
+                EditorUtility.DisplayDialog(
+                    "Не могу загрузить файл",
+                    "Потому что мне нечего загружать, ещё ничего не сохранено по пути\n\n "+ $"Assets/Editor/MeetingRoom/Graphs/{graphFileName}",
+                    "OK"
+                );
+                return; //не пропускаем пользователя дальше, т.к. мы не можем загрузить то, чего не существует
+            }
+
+            MeetingRoom.UpdateFileName(graphData.FileName); //обновляем имя переговорной
+            LoadNodes(graphData.Nodes); //загружаем ноды из SO
+            LoadNodesConnections(); //загружаем проводки между нодами
+
+        }
+
+
+        private static void LoadNodes(List<NodeSaveData> nodes) //загружаем ноды из SO
+        {
+            foreach (NodeSaveData nodeData in nodes) //для каждой ноды, которая есть в загружаемом SO
+            {
+                List<ChoiceSaveData> choices = CloneNodeChoices(nodeData.Choices); //список с клонами кнопок выбора
+                MyNode node = myGraphView.CreateNode(nodeData.Name, nodeData.DialogueType, nodeData.Position, false); //создаём ноду с  её именем, типом (диалоговое окно или кнопки выбора), позицией, и не разрешаем её отрисовывать в момент создания (false)
+                node.ID = nodeData.ID; //загружаем актуальный айдшник
+                node.choices = choices; //загружаем актуальные кнопки выбора
+                node.text = nodeData.Text; //загружаем актуальный текст в ноде
+                node.Draw(); //а вот теперь отрисовываем ноду. До этого было нельзя отрисовать, чтоб не было трабла, что отрисуется одновременно нода со старыми данными и с обновлёнными данными
+                myGraphView.AddElement(node); //добавляем в ноду переговорную
+                loadedNodes.Add(node.ID, node); //добавляем в словарь в загруженными нодами айдишник текущей ноды и саму ноду
+            }
+        }
+
+        private static void LoadNodesConnections()
+        {
+            foreach (KeyValuePair<string, MyNode> loadedNode in loadedNodes) //для каждой пары "ключ-значение" из словаря loadedNodes
+            {
+                foreach (Port choicePort in loadedNode.Value.outputContainer.Children()) //для каждого порта, который прикреплён к текущей загруженной ноде (которая отвечает за кнопки выбора):
+                {
+                    ChoiceSaveData choiceData = (ChoiceSaveData)choicePort.userData; //вспомогательная нода, чтоб по итогу сослаться на текущий айдишник
+                    if (string.IsNullOrEmpty(choiceData.NodeID)) //если нет айдишника, то:
+                    {
+                        continue; //продолжаем логику 
+                    }
+                    MyNode nextNode = loadedNodes[choiceData.NodeID]; //ищем следующую ноду (к которой надо прикрепить проводком предыдущую)
+                    Port nextNodeInputPort = (Port)nextNode.inputContainer.Children().First(); //входной порт у следующей ноды (первый (First) = пустой)
+                    Edge edge = choicePort.ConnectTo(nextNodeInputPort); //присоединить проводком текущую кнопку выбора к входному порту следующей ноды 
+                    myGraphView.AddElement(edge); //выводим визуально в переговорную проводки
+                    loadedNode.Value.RefreshPorts(); //обновляем значения в словаре loadedNode (соответственно и порты в переговорной)
+                }
+            }
         }
 
         #endregion
@@ -65,17 +126,7 @@ namespace MaryDialogSystem.Utilities
 
         private static void SaveNodeToGraph(MyNode node, GraphSaveDataSO graphSaveDataSO)
         {
-            List<ChoiceSaveData> choices = new List<ChoiceSaveData>(); //список с текущими кнопками выбора
-
-            foreach (ChoiceSaveData choice in choices) //для каждой кнопки выбора:
-            {
-                ChoiceSaveData choiceData = new ChoiceSaveData() //в конструкторе переопределяем переменные из скрипта ChoiceSaveData
-                {
-                    Text = choice.Text, //кладём в переменную для текста то, что написали в текущей кнопке выбора
-                    NodeID = choice.NodeID //кладем в переменную для идентификатора айдишник текущей ноды
-                };
-                choices.Add(choiceData); //к кнопкам выбора добавляем ту, которую только что проинициализировали через конструктор 
-            }
+            List<ChoiceSaveData> choices = CloneNodeChoices(node.choices);
 
             NodeSaveData nodeData = new NodeSaveData() //берём данные из скрипта NodeSaveData и переопределяем их на данные текущей ноды, которая попала в этот метод
             {
@@ -89,6 +140,7 @@ namespace MaryDialogSystem.Utilities
 
             graphSaveDataSO.Nodes.Add(nodeData); //к общему списку нод добавляем текущую ноду
         }
+
 
         private static void SaveNodeToScriptableObject(MyNode node, DialogueContainerSO dialogueContainer)
         {
@@ -202,13 +254,19 @@ namespace MaryDialogSystem.Utilities
         private static T CreateAsset<T>(string path, string assetName) where T : ScriptableObject //делегат Т = в него можно запихнуть любой тип данных (сокращение от слова Type), мы пихаем ScriptableObject, который будем создавать в этом методе CreateAsset
         {
             string fullPath = $"{path}/{assetName}.asset"; //полный путь, где создадим ассет
-            T asset = AssetDatabase.LoadAssetAtPath<T>(fullPath); //загружаем созданный ассет по пути fullPath с параметрами <T> (которые в нашем методе CreateAsset находятся)
+            T asset = LoadAsset<T>(path, assetName); //загружаем созданный ассет по пути fullPath с параметрами <T> (которые в нашем методе CreateAsset находятся)
             if (asset == null) //если ассета не существует, значит добавим его:
             {
                 asset = ScriptableObject.CreateInstance<T>(); //создаём экземпляр scriptable object
                 AssetDatabase.CreateAsset(asset, fullPath); //создаем ассет asset и запихиваем его в путь fullPath
             }
             return asset; //возвращаем созданный ассет или подгружаем тот, который уже существовал
+        }
+
+        private static T LoadAsset<T>(string path, string assetName) where T : ScriptableObject //метод для загрузки сохраняшек (загрузки SO, т.к. сохраняшки именно в Scripatble Objects идут)
+        {
+            string fullPath = $"{path}/{assetName}.asset"; //загрузка SO по этому пути
+            return AssetDatabase.LoadAssetAtPath<T>(fullPath); //загружаем SO из fullPath
         }
 
         private static void RemoveAsset(string path, string assetName)
@@ -223,6 +281,23 @@ namespace MaryDialogSystem.Utilities
             AssetDatabase.SaveAssets(); //сохраняем измененный ассет (видит все "грязные", несохраненные ассеты и сохраняет их)
             AssetDatabase.Refresh(); //обновляем инфу, чтоб были актуальные данные (с обновленным ассетом)
         }
+        private static List<ChoiceSaveData> CloneNodeChoices(List<ChoiceSaveData> nodeChoices) //клоны ноды с кнопками выбора
+        {
+            List<ChoiceSaveData> choices = new List<ChoiceSaveData>(); //список с текущими кнопками выбора
+
+            foreach (ChoiceSaveData choice in nodeChoices) //для каждой кнопки выбора:
+            {
+                ChoiceSaveData choiceData = new ChoiceSaveData() //в конструкторе переопределяем переменные из скрипта ChoiceSaveData
+                {
+                    Text = choice.Text, //кладём в переменную для текста то, что написали в текущей кнопке выбора
+                    NodeID = choice.NodeID //кладем в переменную для идентификатора айдишник текущей ноды
+                };
+                choices.Add(choiceData); //к кнопкам выбора добавляем ту, которую только что проинициализировали через конструктор 
+            }
+
+            return choices;
+        }
+
         #endregion
 
     }

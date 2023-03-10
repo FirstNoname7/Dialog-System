@@ -10,5 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dfd8d28a6452c3d4e939b3c5631823a1, type: 3}
-  m_Name: Poppy
+  m_Name: Anything
   m_EditorClassIdentifier: 
+  <FileName>k__BackingField: Anything
+  <Dialogues>k__BackingField:
+  - {fileID: 11400000, guid: 6834d03a26207c146abd91fe27b89b15, type: 2}
+  - {fileID: 11400000, guid: 897ca7e25edf01a499e6cd17fedd06e1, type: 2}
+  - {fileID: 11400000, guid: ba5f57d09961c1c40ac61d149ef5538c, type: 2}

@@ -23,12 +23,12 @@ namespace MaryDialogSystem.Elements
 
         protected MyGraphView myGraphView; //даю дочерним скриптам доступ к этой переменной через модификатор protected
         private Color defaultBackgroundColor; //стандартный цвет ноды
-        public virtual void Initialize(MyGraphView currentGraphView, Vector2 position) //ставим дефолтные значения переменных
+        public virtual void Initialize(string nodeName, MyGraphView currentGraphView, Vector2 position) //ставим дефолтные значения переменных
         {
             ID = Guid.NewGuid().ToString(); //инициализируем текущий идентификатор ноды (команда Guid.NewGuid() создает ID автоматически за нас) и преобразуем его в строчку, чтоб потом использовать (ToString())
             myGraphView = currentGraphView; //инициализируем окно переговорной
             defaultBackgroundColor = new Color(29f / 255f, 29f / 255f, 30f / 255f); //ставим дефолтный цвет ноды
-            dialogueName = "Я";
+            dialogueName = nodeName;
             choices = new List<ChoiceSaveData>();
             text = "Пиши фразу сюды";
             SetPosition(new Rect(position,Vector2.zero)); //настраиваем позицию ноды, которую создаём, чтоб они не создавались на одном и том же месте

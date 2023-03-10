@@ -76,12 +76,15 @@ namespace MaryDialogSystem.Windows
         }
         #endregion
         #region Create
-        public MyNode CreateNode(DialogueType dialogueType, Vector2 position) //создание ноды определенного типа (dialogueType) на определенной позиции (параметр position)
+        public MyNode CreateNode(string nodeName, DialogueType dialogueType, Vector2 position, bool shouldDraw = true) //создание ноды с опр. именем, определенного типа (dialogueType), на определенной позиции (параметр position), с проверкой, должна она отрисовываться или нет
         {
             Type nodeType = Type.GetType($"MaryDialogSystem.Elements.{dialogueType}Node"); //указываю текущий тип ноды (для диалога или для кнопок выбора)
             MyNode node = (MyNode)Activator.CreateInstance(nodeType); //создаю в UI выбранный тип ноды
-            node.Initialize(this, position); //инициализируем ноду, чтоб не показывать пустоту тому, кто увидит ноду в переговорной
-            node.Draw(); //добавляем наполнение в ноду (поле для ввода фразы диалога, входы в ноду и т.д.)
+            node.Initialize(nodeName, this, position); //инициализируем ноду, чтоб не показывать пустоту тому, кто увидит ноду в переговорной
+            if (shouldDraw) //если нам разрешили отрисовать ноду, то:
+            {
+                node.Draw(); //добавляем наполнение в ноду (поле для ввода фразы диалога, входы в ноду и т.д.)
+            }
             AddNode(node); 
             AddElement(node); //добавляем ноду в переговорную
             return node; //возвращаем ноду
@@ -103,7 +106,7 @@ namespace MaryDialogSystem.Windows
                                                                                                      //параметры: actionTitle для заголовка кнопки, dialogueType для указания типа ноды (диалог или кнопки выбора)
         {
             ContextualMenuManipulator contextualMenuManipulator = new ContextualMenuManipulator(
-                menuEvent => menuEvent.menu.AppendAction(actionTitle, actionEvent => AddElement(CreateNode(dialogueType, GetLocalMousePosition(actionEvent.eventInfo.localMousePosition))))); //в контекстном меню можно создать новую ноду. Позиция берется исходя из того, где находится курсор + превращается в локальные координаты
+                menuEvent => menuEvent.menu.AppendAction(actionTitle, actionEvent => AddElement(CreateNode("Название", dialogueType, GetLocalMousePosition(actionEvent.eventInfo.localMousePosition))))); //в контекстном меню можно создать новую ноду. Позиция берется исходя из того, где находится курсор + превращается в локальные координаты
             return contextualMenuManipulator; //возвращаем новые пункты в контекстное меню
         }
 
